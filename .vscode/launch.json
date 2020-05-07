@@ -13,7 +13,10 @@
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "npm: watch"
+            "preLaunchTask": {
+                "type" : "npm",
+                "script": "watch"
+            }
         },
         {
             "name": "Extension Tests",
@@ -27,7 +30,20 @@
             "outFiles": [
                 "${workspaceFolder}/out/test/**/*.js"
             ],
-            "preLaunchTask": "npm: watch"
+            "preLaunchTask": {
+                "type" : "npm",
+                "script": "watch"
+            }
+        },
+        {
+            "name": "Attach to Server",
+            "type": "node",
+            "request": "attach",
+            "port": 6009,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceRoot}/server/out/**/*.js"
+            ]
         }
     ]
 }

@@ -1,8 +1,4 @@
 {
-	"comments": {
-		"lineComment": "",
-		"blockComment": []
-	},
 	"brackets": [
 		[
 			"[",
@@ -39,5 +35,33 @@
 			"close": "'"
 		}
 	],
-	"wordPattern": "[\\-a-zA-Z0-9_]+"
+	"surroundingPairs": [
+		[
+			"{",
+			"}"
+		],
+		[
+			"[",
+			"]"
+		],
+		[
+			"(",
+			")"
+		],
+		[
+			"\"",
+			"\""
+		],
+		[
+			"'",
+			"'"
+		]
+	],
+	"folding": {
+		"markers": {
+			"start": "^\\s*\\$region",
+			"end": "^\\s*\\$end-region"
+		}
+	},
+	"wordPattern": "[a-zA-Z0-9_\\-]+"
 }

@@ -1,12 +1,10 @@
 # COBOL Source colouriser for Visual Studio Code
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/bitlang.cobol.svg)](https://marketplace.visualstudio.com/items?itemName=bitlang.cobol)
-[![Installs](https://vsmarketplacebadge.apphb.com/installs/bitlang.cobol.svg)](https://marketplace.visualstudio.com/items?itemName=bitlang.cobol)
-
+[![Version](https://vsmarketplacebadge.apphb.com/version/bitlang.cobol.svg)](https://marketplace.visualstudio.com/items?itemName=bitlang.cobol) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/bitlang.cobol.svg)](https://marketplace.visualstudio.com/items?itemName=bitlang.cobol) [![Downloads](https://vsmarketplacebadge.apphb.com/downloads-short/bitlang.cobol.svg)](https://marketplace.visualstudio.com/items?itemName=bitlang.cobol) [![Rating](https://vsmarketplacebadge.apphb.com/rating-star/bitlang.cobol.svg)](https://marketplace.visualstudio.com/items?itemName=bitlang.cobol) [![chat-img](https://img.shields.io/badge/Gitter-Join_the_vscode_cobol_chat-brightgreen.svg)](https://gitter.im/vscode_cobol/community)
 --------------
 
 ## What is this?
-Syntax highlighting for COBOL and JCL!
+Syntax highlighting for COBOL, JCL, PL/I and MF directive files.
 
 ## What is this not?
 An Integrated Development Environment for COBOL.
@@ -17,8 +15,23 @@ Quick viewing of COBOL source and edit.
 ## What platform can it be used on?
 Everywhere Visual Studio Code works.. aka Windows, Linux and Mac OSX.
 
-## What does it look like?
- ![pi.cbl](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/screenshot_pi.png)
+## Code colourisation for COBOL, PL/I and JCL:
+ ![sieve_jcl](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/screenshot_three.png)
+
+## IntelliSense example:
+![perform_add](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/perform_add.gif)
+ 
+## Breadcrumb support:
+![breadcrumbs](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/breadcrumb.png)
+
+## Outline support:
+![outline](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/outline.png)
+
+## Goto definition:
+![gotodef](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/gotodef.gif)
+
+## Peek definition:
+![peekdef](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/peekdef.gif)
 
 ## Keybinds
 
@@ -29,8 +42,9 @@ Everywhere Visual Studio Code works.. aka Windows, Linux and Mac OSX.
 | ctrl+alt+d  | Goto data division (or working-storage section if not present) |
 | ctrl+alt+,  | Go backwards to next section/division |
 | ctrl+alt+.  | Go forward to next next section/division |
-| alt+c       | Move to copybook/file |
-| shift+alt+c | Move back to previous file (after move to copybook) |
+| f12 or ctrl+click | Move to copybook/file |
+| ctrl+hover over copybook | Peek head of copybook |
+| right mouse/peek | Peek copybook without opening the file) |
 
 ## Settings
 
@@ -42,7 +56,7 @@ Everywhere Visual Studio Code works.. aka Windows, Linux and Mac OSX.
 
 Visual Studio code can be setup to build your COBOL source code.
 
-### Task to use MsBuild
+### Task: Using MsBuild
 
 MsBuild based projects can be consumed as build task, allowing navigation to error/warnings when they occur.
 
@@ -67,25 +81,147 @@ Below is an example of *build* task that uses *mycobolproject.sln*.
             "presentation": {
                 "reveal": "always"
             },
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$mfcobol-msbuild"
         }
     ]
-
 }
 ```
 
+### Task: Single file compile using Micro Focus COBOL - ERRFORMAT(3)
+
+The example below shows you how you can create a single task to compile one program using the `cobol` command.
+
+```json
+{
+    "label": "mf cobol (single file)",
+    "command": "cobol",
+    "args": [
+        "${file}",
+        "noint",
+        "nognt",
+        "noobj",
+        "noquery",
+        "errformat(3)",
+        "COPYPATH($COBCPY;${workspaceFolder}\\CopyBooks;${workspaceFolder}\\CopyBooks\\Public)",
+        ";"
+    ],
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    },
+    "options": {
+        "cwd": "${workspaceRoot}"
+    },
+    "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": true,
+        "panel": "dedicated"
+    },
+    "problemMatcher": "$mfcobol-errformat3"
+}
+```
+
+### Task: Single file compile using Micro Focus COBOL - ERRFORMAT(2)
+
+The example below shows you how you can create a single task to compile one program using the `cobol` command.
+
+```json
+{
+    "label": "mf cobol (single file)",
+    "command": "cobol",
+    "args": [
+        "${file}",
+        "noint",
+        "nognt",
+        "noobj",
+        "noquery",
+        "errformat(2)",
+        "COPYPATH($COBCPY;${workspaceFolder}\\CopyBooks;${workspaceFolder}\\CopyBooks\\Public)",
+        ";"
+    ],
+    "group": {
+        "kind": "build",
+        "isDefault": true
+    },
+    "options": {
+        "cwd": "${workspaceRoot}"
+    },
+    "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": true,
+        "panel": "dedicated"
+    },
+    "problemMatcher": "$mfcobol-errformat2"
+}
+```
+
+### Task: Single file compile using GnuCOBOL/OpenCOBOL/COBOL-IT
+
+The example below shows you how you can create a single task to compile one program using the `cobc` command.
+
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "gnucobol - cobc (single file)",
+            "type": "shell",
+            "command": "cobc",
+            "args": [
+                "-fsyntax-only",
+                "-I${workspaceFolder}\\CopyBooks",
+                "-I${workspaceFolder}\\CopyBooks\\Public",
+                "${file}"
+            ],
+            "problemMatcher" : "$gnucobol-cobc"
+        }
+    ]
+}
+```
+
+
+### Task: Single file compile using ACUCOBOL-GT
+
+The example below shows you how you can create a single task to compile one program using the `ccbl32` command.
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "acu cobol - ccbl32 (single file)",
+            "type": "shell",
+            "command": "%ACUCOBOL%\\bin\\ccbl32",
+            "args": [
+                "-Sp", "${workspaceFolder}\\CopyBooks",
+                "-Sp", "${workspaceFolder}\\CopyBooks\\Public",
+                "${file}"
+            ],
+            "windows": {
+                "options": {
+                    "env": {
+                        "ACUCOBOL" : "C:\\extend10.1.1\\AcuGT"
+                    }
+                }
+            },
+            "problemMatcher" : "$acucobol-ccbl"           
+        }
+    ]
+}
+```
 ## Complementary extensions
 
 ### [ToDo tree](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree) by Gruntfuggly
 
-Although this extension does not understand comments in COBOL source files, it can be made to my adding the following user setting:
+Although this extension does not understand comments in COBOL source files, it can be made to by adding the following user setting:
 
 ```json
 {
     "todo-tree.flat": false,
     "todo-tree.expanded": true,
 
-    "todo-tree.regex": "((//|#|<!--|;|/\\*|\\*>|^      \\*)\\s*($TAGS)|^\\s*- \\[ \\])",
+    "todo-tree.regex": "((//|#|<!--|;|/\\*|\\*>|^......\\*)\\s*($TAGS)|^\\s*- \\[ \\])",
     "todo-tree.tags": [
         "TODO",
         "FIXME",
@@ -118,3 +254,71 @@ Although this extension does not understand comments in COBOL source files, it c
 
 ![alt](images/[readme]-fix-files-extenssions.gif)
 
+## coboleditor.fileformat
+
+When ```coboleditor.margin``` is enabled extension will look for "sourceformat" settings in the header of the source file itself.
+
+However, if you need to tell the extension which file are which particular format, this can be achieved with ```coboleditor.fileformat``` property.
+
+For example, if you want all the files that match ```A*.cbl``` to be fixed and every other *.cbl is free format, you can then use:
+
+```json
+    "coboleditor.fileformat": [
+        {
+            "pattern": "**/A*.cbl",
+            "sourceformat": "fixed"
+        },
+        {
+            "pattern": "**/*.cbl",
+            "sourceformat": "free"
+        }
+    ],
+```
+
+## Handling code pages
+
+The defaults embedded in the extension can be overwritten by either changing sessions at the user level in the settings json or more efficiently, you change it just for the "COBOL" files.
+
+For example, to ensure you use utf8 for all you files use:
+
+```json
+{
+    "[COBOL]": {
+        "files.encoding": "utf8",
+        "files.autoGuessEncoding": false
+    }
+}
+```
+
+## coboleditor.experimential_features
+
+Currently I have only one is active experimential feature and this is "hover" support for known APIs.
+
+This currently includes most of the *Micro Focus COBOL Library API* (CBL_) and a subset of ILE date apis.
+
+This can be activated by setting the flag coboleditor.experimential_features in the settings panel.
+
+and looks like:
+
+ ![hover](https://raw.githubusercontent.com/spgennard/vscode_cobol/master/images/hover.png)
+
+## Online resources
+
+- [Facebook COBOL Group](https://www.facebook.com/groups/COBOLProgrammers/)
+
+## Shortcuts
+
+
+ - [ALT] + [SHIFT] + [C]: Change to COBOL Syntax (default)
+ - [ALT] + [SHIFT] + [A]: Change to ACUCOBOL-GT Syntax
+ - [ALT] + [SHIFT] + [O]: Change to OpenCOBOL Syntax
+ - [ALT] + [SHIFT] + [G]: Change to GnuCOBOL Syntax
+ - [ALT] + [SHIFT] + [M]: Toggle margins (overrides user/workspace settings)
+
+## Contributors
+
+I would like to thank the follow contributors for providing patches, fixes, kind words of wisdom and enhancements.
+
+ - Ted John of Berkshire, UK
+ - Kevin Abel of Lincoln, NE, USA
+ - Simon Sobisch of Germany
